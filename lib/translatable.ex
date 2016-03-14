@@ -14,6 +14,15 @@ defmodule Translatable do
       iex> Translatable.from_original(" simple text: ")
       %Translatable{original: " simple text: ", text: "simple text", key: "simple_text", prefix: " ", suffix: ": "}
 
+      iex> Translatable.from_original("simple text: ")
+      %Translatable{original: "simple text: ", text: "simple text", key: "simple_text", prefix: "", suffix: ": "}
+
+      iex> Translatable.from_original(" simple text")
+      %Translatable{original: " simple text", text: "simple text", key: "simple_text", prefix: " ", suffix: ""}
+
+      iex> Translatable.from_original("simple text")
+      %Translatable{original: "simple text", text: "simple text", key: "simple_text", prefix: "", suffix: ""}
+
   """
   def from_original(original_text) do
     text = extract_text(original_text)
