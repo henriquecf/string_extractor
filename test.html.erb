@@ -1,0 +1,343 @@
+<% title @ticketed_event.title_string %>
+<%content_for :extra_wrapper_classes do%>nobottom_content<%end%>
+<%if @ticketed_event.status != 2%>
+  <div id="create_action_title">
+    <h2></h2>
+    <div class="create_action_steps clearfix">
+    	<span class="step first step_current"><%= t(:buy_tickets, default: "Buy Tickets") %></span>
+      <<%=@ticketed_event.title ? "a" : "span"%> href="<%=thankyou_ticketed_event_path(@ticketed_event.permalink,:hash => @ticketed_event.phash)%>" class="step last <%="step_complete" if @ticketed_event.isValid2?%>">Thank You</<%=@ticketed_event.title ? "a" : "span"%>>
+    </div>
+  </div>
+<%end%>
+<div id="sidebar" class="donate_sidebar js-sidebar">
+    <%= render "widget-counter" %>
+    <div class="sticky_sidebar js-sticky_sidebar action_sidebar">
+
+				<% if !@ticketed_event.has_no_location %>
+	        <div id="sidebar_map_wrap">
+	            <div id="map_canvas" class="map-search-results"></div>
+	        </div>
+				<% end %>
+
+        <div id="action_info" class="noborder">
+            <div id="action_info_inner" class="clearfix">
+				<% if @ticketed_event.display_creator %>
+	                <div class="sponsor_owner_box">
+	                    <div class="action_owner_title nopt"><h6>Created by</h6></div>
+	                    <div class="action_owner_wrap">
+	                        <div class="action_owner">
+	                          <%= link_to profile_user_path(@ticketed_event.user.permalink) do %>
+	                            <%= image_tag @ticketed_event.user.avatar.url(:thumb), alt: "Username", class: "action_author_avatar avatar" %>
+	                          <% end %>
+	                            <div class="action_info_user">
+	                              <%= link_to @ticketed_event.user.name, profile_user_path(@ticketed_event.user.permalink) %>
+	                            </div>
+	                            <div class="action_info_location">
+	                              <%= @ticketed_event.user.city %>, <%= @ticketed_event.user.state %>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </div>
+				<% end %>
+
+                <% if @ticketed_event.group %>
+                  <div class="sponsor_owner_box">
+                      <div class="action_owner_title action_sponsor_title"><h6>Sponsored by</h6></div>
+                      <div class="action_owner_wrap action_sponsor_wrap">
+                          <div class="action_owner">
+                              <%= link_to group_path(@ticketed_event.group.permalink) do %>
+                                <%= image_tag @ticketed_event.group.photo.url(:thumb), alt: "Username", class: "action_author_avatar avatar" %>
+                              <% end %>
+                              <div class="action_info_user">
+                                <%= link_to @ticketed_event.group.title, group_path(@ticketed_event.group.permalink) %>
+                              </div>
+                              <% if @ticketed_event.group.city.present? %>
+                                <div class="action_info_location">
+                                  <%= @ticketed_event.group.city %>, <%= @ticketed_event.group.state %>
+                                </div>
+                              <% end %>
+                          </div>
+                      </div>
+                  </div>
+                <% end %>
+            </div>
+        </div>
+        <div class="spam_flag"><a href="#">Flag As Spam</a></div>
+    </div>
+</div>
+
+<div id="action_head" class="main_col js-action_head js-main_col">
+    <h2 class="entry-title"><%= @ticketed_event.title %></h2>
+    <div class="event_info js-event_info">
+        <div class="event_info_inner clearfix">
+            <h5 class="event_date">
+							<span class="graytext mr5"><%= t(:start, default: "Start") %>:</span><%= @ticketed_event.start_at.present? ? @ticketed_event.start_at.strftime("%B %d, %Y") : "[event date]" %> <span class="bullet">&bull;</span> <%= @ticketed_event.start_at.present? ? @ticketed_event.start_at.strftime("%l:%M %p") : "[event date]" %>
+              <% if @ticketed_event.has_no_location %>
+	        			<span class="bullet">&bull;</span>
+	        			<%= @ticketed_event.timezone %>
+              <% end %>
+						</h5>
+	          <% if @ticketed_event.has_end_date and @ticketed_event.end_at %>
+	            <h5 class="event_date">
+	              <span class="graytext mr5">End:</span>
+	              <%= @ticketed_event.end_at.strftime("%B %d, %Y")%><span class="bullet">&bull;</span><%= @ticketed_event.end_at.strftime("%l:%M %p") %>
+	              <% if @ticketed_event.has_no_location %>
+		        			<span class="bullet">&bull;</span>
+		        			<%= @ticketed_event.timezone %>
+	              <% end %>
+	          	</h5>
+						<% end %>
+						<% if !@ticketed_event.has_no_location %>
+	            <h5 class="event_location"><%= @ticketed_event.location_name.present? ? @ticketed_event.location_name.html_safe : "[location name]" %> <span class="bullet">&bull;</span> <%= @ticketed_event.address.present? ? @ticketed_event.address.html_safe : "[address]" %>, <%= @ticketed_event.city.present? ? @ticketed_event.city.html_safe : "[city]" %>,
+	            <% if @ticketed_event.country == "US" %><%= !@ticketed_event.state.blank? ? @ticketed_event.state.html_safe : "[state]"%><%else%><%=!@ticketed_event.country.blank? ? COUNTRY[@ticketed_event.country].to_s.html_safe : "[country]"%><%end%>
+            <%= @ticketed_event.zip_code.present? ? @ticketed_event.zip_code.html_safe : "[zip]" %></h5>
+						<% end %>
+            <%unless @ticketed_event.contact_info.blank?%>
+            <h5 class="event_contact"><span class="graytext">Host Contact Info: <span class="ml5"></span></span> <%= @ticketed_event.contact_info %></h5>
+            <%end%>
+        </div>
+    </div>
+
+    <%= image_tag @ticketed_event.photo.url, :class => "mb20" if @ticketed_event.photo.exists? %>
+    <div class="action_description clearfix">
+        <%= @ticketed_event.description_text.present? ? @ticketed_event.description_text.html_safe : "[event description]" %>
+    </div>
+
+    <%= form_for [@ticketed_event, @ticket_receipt], method: "post", html: { id: "donate_form", class: "buy_tickets_form mt20 js-donate_form" } do |f| %>
+		<%= f.hidden_field :ticketed_event_id %>
+		<%=hidden_field_tag(:test_mode , "true") if params[:test_mode] == "true"%>
+		<%= hidden_field_tag(:default_email , SecureRandom.uuid+"@actionnetwork.org") if @ticketed_event.donations_without_email %>
+        <div id="select_tickets" class="white_box p20 border-box clearfix">
+	        <% if  @ticketed_event.start_at and @ticketed_event.start_at.to_date < Date.today-1%>
+	        <h3 class="tear_off_title20 centertext grayback">This Event Is Over</h3>
+	        <p class="centertext">This event has already occurred.</p>
+	        <% else %>
+            <h3 class="tear_off_title20 centertext grayback"><%= t(:select_your_tickets, default: "Select Your Tickets") %></h3>
+            <ul class="nomb lined">
+				<%= f.fields_for :user_tickets, @ticket_receipt.initialize_user_tickets do |ut| %>
+                  <li class="js-ticket_option">
+                      <div class="twenty left">
+						  <%= ut.hidden_field :ticket_id %>
+                          <% if ut.object.ticket.available > 0 %>
+						  	<%= ut.number_field :quantity, min: 1, placeholder: t(:amount, default: "Amount"), class: "digits js-ticketed_event_ticket_number required_group js-required_group" %>
+                          <% else %>
+                            <strong class="redtext block">SOLD OUT</strong>
+                          <% end %>
+                      </div>
+                      <div class="five left">&nbsp;</div>
+                      <div class="fifty left">
+                          <strong><%= ut.object.ticket.title %></strong>
+                          <% if ut.object.ticket.description.present? %>
+                            <span class="dash">&mdash;</span> <%= ut.object.ticket.description %>
+                          <% end %>
+                      </div>
+                      <div class="five left">&nbsp;</div>
+                      <div class="twenty left">
+                          <% if ut.object.ticket.price > 0 %>
+                            <strong class="js-ticketed_event_ticket_amount"><%= number_to_currency(ut.object.ticket.price) %></strong> per ticket
+                          <% else %>
+                            <strong><%= t(:free, default: "FREE") %></strong>
+                          <% end %>
+                      </div>
+                  </li>
+                <% end %>
+                <li>
+                    <div class="eighty left graytext">SUBTOTAL</div>
+                    <div class="twenty left">
+                        <strong class="js-ticketed_event_subtotal">$0.00</strong>
+                    </div>
+                </li>
+            </ul>
+            <% end %>
+        </div>
+
+        <div id="donation_recipient_wrap" class="clearfix">
+            <h5><%= t(:your_payment_will_go_to, default: "Your payment will go to") %></h5>
+            <div class="donation_recipients">
+                <div class="single_recipient clearfix">
+                    <% if @ticketed_event.recipient.is_a? User %>
+                      <%= link_to profile_user_path(@ticketed_event.recipient.permalink), class: "recipient_avatar_link" do %>
+                        <%= image_tag @ticketed_event.recipient.avatar.url(:thumb), alt: "Username", class: "donation_avatar avatar" %>
+                      <% end %>
+                      <div class="donation_info">
+                          <div class="donation_info_user">
+                                <%= link_to @ticketed_event.recipient.name, profile_user_path(@ticketed_event.recipient.permalink) %>
+                          </div>
+                          <div class="donation_info_location"><%= @ticketed_event.recipient.city %>, <%= @ticketed_event.recipient.state %></div>
+                      </div>
+                    <% else %>
+											<% if @ticketed_event.recipient.present? %>
+	                      <%= link_to group_path(@ticketed_event.recipient.permalink), class: "recipient_avatar_link" do %>
+	                        <%= image_tag @ticketed_event.recipient.photo.url(:thumb), alt: "Username", class: "donation_avatar avatar" %>
+	                      <% end %>
+	                      <div class="donation_info">
+	                          <div class="donation_info_user">
+	                              <%= link_to @ticketed_event.recipient.title, group_path(@ticketed_event.recipient.permalink) %>
+	                          </div>
+	                          <% if @ticketed_event.recipient.city.present? %>
+	                              <div class="donation_info_location"><%= @ticketed_event.recipient.city %>, <%= @ticketed_event.recipient.state %></div>
+	                          <% end %>
+	                      </div>
+	                    <% end %>
+										<% end %>
+                </div>
+            </div>
+        </div>
+
+        <% if  @ticketed_event.start_at and @ticketed_event.start_at.to_date < Date.today-1%>
+        <% else %>
+        <ul class="clearfix nofloat">
+
+			<%if (current_user.nil? and @ticket_receipt.user.id.nil?) or @ticketed_event.status != 2 or params[:new_credit_card] or (@ticket_receipt.user.id and (@ticket_receipt.user.first_name.blank? or @ticket_receipt.user.last_name.blank?))%>
+			  <%=render :partial => "not_logged_in_form"%>
+			<%elsif @ticket_receipt.user.id and @ticket_receipt.user.street.blank? and !@ticket_receipt.user.first_name.blank? and !@ticket_receipt.user.last_name.blank?%>
+			  <%=render :partial => "recognized_no_address_form"%>
+			<%elsif (@ticket_receipt.user.id and current_user.nil? and !@ticket_receipt.user.first_name.blank? and !@ticket_receipt.user.last_name.blank?) or (current_user and !current_user.save_credit_card)%>
+			  <%=render :partial => "recognized_no_credit_card_form"%>
+			<%elsif current_user and current_user.save_credit_card and current_user.credit_card_id and params[:new_credit_card].nil? and  @ticketed_event.status == 2%>
+			  <%=render :partial => "logged_in_with_credit_card_form"%>
+			<%end%>
+
+
+
+            <div class="fundraising_form_builder">
+            <%= render partial:"/questions/custom_fields",locals: {action: @ticketed_event} %>
+            </div>
+            <%if @ticketed_event.user.lists_enabled%>
+          <%=f.hidden_field :tip_amount, :value => "0"%>
+		  <%else%>
+            <li id="tip_jar">
+                <span id="tip_jar_inner" class="clearfix">
+                    <h4 class="nomt"><%= t(:help_us_keep_the_lights_on, default: "Help Us Keep The Lights On") %></h4>
+                    <span class="tip_jar_desc">This page is hosted by Action Network, a <strong>non-profit</strong> that helps build movements online. Your tip will keep this technology affordable so our movement can continue to win.</span>
+	                <span class="tip_jar_fields clearfix">
+	                  <label class="tip_label js-tip_label tip_label-selected js-tip_label-selected"><input type="radio" <%= "checked" if (params[:tip_amount].blank? or params[:tip_amount] == "10") && !@oneclick %> name="ticket_receipt[tip_amount]" value="10" <%= " disabled " if @ticketed_event.status != 2 %>/> 10%</label>
+	                  <label class="tip_label js-tip_label"><input type="radio" <%= "checked" if params[:tip_amount] == "20" %> name="ticket_receipt[tip_amount]" value="20" <%=" disabled " if @ticketed_event.status != 2 %>/> 20%</label>
+	                  <label class="tip_label js-tip_label tip_label_other js-tip_label_other other_label js-other_label">
+	                  <input type="radio" <%= "checked" if params[:tip_amount] == "other" %> name="ticket_receipt[tip_amount]" value="other" <%= " disabled " if @ticketed_event.status != 2 %>/>
+	                  <input type="text" placeholder="$ Other" id="tip_jar_amount" size="35" value="<%= params[:custom_tip_amount].to_s %>" name="ticket_receipt[custom_amount]" min="1"  class="other_input js-other_input number"<%=" disabled " if @ticketed_event.status != 2 %>></label>
+	                  <label class="tip_label js-tip_label"><input type="radio" <%= "checked" if params[:tip_amount] == "0" or @oneclick %> name="ticket_receipt[tip_amount]" value="0" <%= " disabled " if @ticketed_event.status != 2 %>/> No Tip</label>
+	                </span>
+                </span>
+            </li>
+            <%end%>
+            <%if @ticketed_event.status == 2%>
+            <li id="donate_form_button-li">
+            	<input type="hidden" name="ticket_receipt[total_amount]" value="0" id="donation_total_amount"/>
+                <input type="submit" id="donate_form_button" class="button button_red js-ticketed_event_form_button" value="Purchase Tickets">
+            </li>
+             <%end%>
+            <li id="error_message" class="js-error_message"></li>
+            <%=render :partial => '/actions/additional_data',:locals => {:action => @ticketed_event}%>
+        </ul>
+        <div class="clear"></div>
+         <div id="donate_disclaimer">
+          <%=simple_format(@ticketed_event.description_info)%>
+		</div>
+		<% end %>
+		<% end %>
+</div>
+
+<% content_for :extra_js do %>
+	<% if !@ticketed_event.has_no_location %>
+  <script src="//maps.googleapis.com/maps/api/js?key=AIzaSyBwlG6j-W0eqwx8OiDK1YH--midf-b1DPo&sensor=false" type="text/javascript"></script>
+  <script type="text/javascript">
+  $(document).ready(function($) {
+          // init variables we're going to need
+      var geocoder;
+      var map;
+      var marker;
+
+      var LatLngList = [];
+
+      var infoWindow = new google.maps.InfoWindow({
+          content: 'content!'
+      });
+
+      // init the map
+      google_map_initialize = function() {
+          geocoder = new google.maps.Geocoder();
+          // starting options
+          var latlng = new google.maps.LatLng(0,0);
+          var myOptions = {
+              zoom: 15,
+              center: latlng,
+              mapTypeId: google.maps.MapTypeId.ROADMAP
+          }
+          map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+
+          // loop through each event
+
+          // content for popup
+          var contentString =
+               '<div id="map-notice-content"><strong><%=j(!@ticketed_event.location_name.blank? ? @ticketed_event.location_name.html_safe : "[location name]")%></strong><br/>' +
+               '<em><%=@ticketed_event.start_at ? @ticketed_event.start_at.strftime("%B %d, %Y") : "[start date]"%> <span class="bullet">&bull;</span> <%=@ticketed_event.start_at ? @ticketed_event.start_at.strftime("%l:%M %p") : "[start time]"%></em><br/>' +
+               '<% if @ticketed_event.has_end_date and @ticketed_event.end_at %><em>End: <%=@ticketed_event.end_at ? @ticketed_event.end_at.strftime("%B %d, %Y") : "[end date]"%> <span class="bullet">&bull;</span> <%=@ticketed_event.end_at ? @ticketed_event.end_at.strftime("%l:%M %p") : "[end time]"%></em><br/><% end %>' +
+               '<%=j(!@ticketed_event.address.blank? ? @ticketed_event.address.html_safe : "[address]")%><br/>' +
+               ' <%=j(!@ticketed_event.city.blank? ? @ticketed_event.city.html_safe : "[city]")%>, <%if @ticketed_event.country == "US"%><%=j(!@ticketed_event.state.blank? ? @ticketed_event.state.html_safe : "[state]")%><%else%><%=j(!@ticketed_event.country.blank? ? COUNTRY[@ticketed_event.country].to_s.html_safe : "[country]")%> <%end%><%=j(!@ticketed_event.zip_code.blank? ? @ticketed_event.zip_code.html_safe : "[zip]")%><br/>';
+
+          var address = "<%=j(!@ticketed_event.address.blank? ? @ticketed_event.address.html_safe : "[address]")%>, <%=j(!@ticketed_event.city.blank? ? @ticketed_event.city.html_safe : "[city]")%>, <%if @ticketed_event.country == 'US'%><%=j(!@ticketed_event.state.blank? ? @ticketed_event.state.html_safe : "[state]")%><%else%><%=j(!@ticketed_event.country.blank? ? COUNTRY[@ticketed_event.country].to_s.html_safe : "[country]")%><%end%> <%=j(!@ticketed_event.zip_code.blank? ? @ticketed_event.zip_code.html_safe : "[zip]")%>";
+
+          // geocode the address
+          geocoder.geocode( { 'address': address}, function(results, status) {
+              if (status == google.maps.GeocoderStatus.OK) {
+
+                  // set a marker
+                  marker = new google.maps.Marker({
+                      map: map,
+                      position: results[0].geometry.location
+                  });
+
+                  // add a listener for the popup
+                  google.maps.event.addListener(marker, 'click', function() {
+                      infoWindow.setContent(contentString);
+                      infoWindow.open(map,marker);
+                  });
+
+                  // fit map to event markers
+
+                  // make an array of lats and longs of markers
+
+                  LatLngList.push(marker.position);
+
+                  var bounds = new google.maps.LatLngBounds();
+
+                  // loop through and set bounds
+                  for (var i = 0, LtLgLen = LatLngList.length; i < LtLgLen; i++) {
+                      bounds.extend(LatLngList[i]);
+                  }
+
+                  // center map using bounds
+                  map.fitBounds(bounds);
+                  map.setZoom(13);
+              } else {
+                  //alert("Geocode was not successful for the following reason: " + status);
+              }
+          });
+
+      }
+
+      google_map_initialize();
+
+      $(document).on('tabMove', function(event, element) {
+          if (element == '#tab_info') {
+              if(typeof google_map_initialized === 'undefined') {
+                  google_map_initialize();
+                  google_map_initialized = true;
+              }
+          }
+      });
+  });
+
+  </script>
+	<% end %>
+
+  <script type="text/javascript">
+  <%if params[:test_mode] == "true"%>
+    wepay_client_id = <%=ENV["TEST_CLIENT_ID"]%>;
+  <%else%>
+    wepay_client_id = <%=ENV["CLIENT_ID"]%>;
+  <%end%>
+  wepay_form = true;
+</script>
+<% end %>
