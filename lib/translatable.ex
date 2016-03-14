@@ -37,17 +37,17 @@ defmodule Translatable do
     |> Enum.join("_")
   end
 
-  def extract_prefix(original_text) do
+  defp extract_prefix(original_text) do
     Regex.named_captures(@prefix_pattern, original_text)
     |> Map.get("prefix")
   end
 
-  def extract_suffix(original_text) do
+  defp extract_suffix(original_text) do
     Regex.named_captures(@suffix_pattern, original_text)
     |> Map.get("suffix")
   end
 
-  def extract_text(original_text) do
+  defp extract_text(original_text) do
     text_without_prefix = Regex.replace(@prefix_pattern, original_text, "")
     Regex.replace(@suffix_pattern, text_without_prefix, "")
   end
