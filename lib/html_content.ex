@@ -33,9 +33,6 @@ defmodule HtmlContent do
     |> remove_empty_arrays
     |> Stream.map(&filter_out_only_spaces/1)
     |> remove_empty_arrays
-    #|> Stream.map(&strip_strs/1)
-    #|> Stream.map(&filter_out_empty_strings/1)
-    #|> Stream.filter(&(length(&1) != 0))
     |> Enum.to_list
   end
 
@@ -53,14 +50,6 @@ defmodule HtmlContent do
 
   defp filter_out_only_spaces(list) do
     Enum.filter(list, fn(line) -> !Regex.match?(~r{^\s*$}, line) end)
-  end
-
-  defp strip_strs(list) do
-    Enum.map(list, fn(str) -> String.strip(str) end)
-  end
-
-  defp filter_out_empty_strings(list) do
-    Enum.filter(list, fn(str) -> String.length(str) != 0 end)
   end
 
   defp filter_out_question_marks(list) do
