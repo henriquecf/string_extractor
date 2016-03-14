@@ -1,0 +1,155 @@
+<div class="create_action_title super_create_action_title">
+		<div class="relative">
+			<h2>Preview Host Form</h2>
+			<div class="create_action_steps clearfix">
+				<a href="#" class="step first step_current">Pitch</a>
+				<a href="<%=preview_step3_event_campaign_path(@event_campaign.permalink,:hash => params[:hash])%>" class="step last <%="step_complete" if !@event_campaign.host_instructions.blank?%>">Instructions</a>
+			</div>
+		</div>
+	</div>
+<form action="" method="" id="create_action_form" class="create_host_pitch_form js-create_host_pitch_form edit_event js-edit_event js-create_action_form">
+	<div class="create_action_title clearfix">
+		<div><h2 class="disabled">Create An Event: <%=@event_campaign.title.blank? ? "[Event Campaign Title]" : @event_campaign.title%></h2></div>
+
+		<div class="create_action_steps clearfix disabled">
+			<div class="clearfix">
+				<a href="#" class="step first step_current">Event RSVP</a>
+				<a href="<%=preview_step3_event_campaign_path(@event_campaign.permalink)%>" class="step last">Event Thank You</a>
+			</div>
+		</div>
+	</div>
+	<div class="event_page">
+		<div id="sidebar" class="disabled js-sidebar">
+			<div class="action_sidebar sticky_sidebar js-sticky_sidebar">
+				<h4 class="disabled">Attend This Event</h4>
+				<ul>
+					<li>
+						<input type="text" size="35" class="disabled" name="form-first_name" id="form-first_name" placeholder="First Name" disabled="disabled" />
+						<span class="sample_field">Sample</span>
+					</li>
+					<li>
+						<input type="text" size="35" class="disabled" name="form-last_name" id="form-last_name" placeholder="Last Name" disabled="disabled" />
+						<span class="sample_field">Sample</span>
+					</li>
+					<li>
+						<input type="email" size="35" class="disabled" name="form-email" id="form-email" placeholder="Email *" disabled="disabled" />
+						<span class="sample_field">Sample</span>
+					</li>
+					<li>
+						<input type="text" size="35" class="disabled" name="form-zip_code" id="form-zip_code" placeholder="Zip/Postal Code *" disabled="disabled" />
+						<span class="sample_field">Sample</span>
+					</li>
+
+			          <span class="international_link-wrap js-international_link-wrap disabled">
+			              <a class="international_link js-international_link disabled">Not in the US?</a>
+			          </span>
+					<li class="mt10">
+						<input type="submit" class="disabled" value="Send RSVP" disabled="disabled" />
+						<span class="sample_field sample_button">Sample</span>
+					</li>
+				</ul>
+				<div class="clear"></div>
+			</div>
+		</div>
+		<div id="action_head" class="main_col js-main_col disabled js-action_head">
+			<a href="#pitch_modal" id="view_instructions_button" class="button button_red lightbox js-view_instructions_button">View Guidelines <i class="fa fa-plus"></i></a>
+			<div class="hide">
+		  		<div id="pitch_modal">
+		  			<h2 class="entry-title js-entry-title mb20">Host Guidelines: <%=@event_campaign.title.blank? ? "[Event Campaign Title]" : @event_campaign.title%></h2>
+		  			<div class="pitch"><%=!@event_campaign.host_pitch.blank? ? simple_format(@event_campaign.host_pitch.html_safe) : "[Host Pitch]"%></div>
+					<a href="javascript:;" onclick="$.fancybox.close();" class="button button_blue mt20">Okay!</a>
+		  		</div>
+	  		</div>
+			<div class="entry-title js-entry-title mb10">
+				<input type="text" name="event-title" id="event-title" class="create_action-editable js-create_action-editable" placeholder="Title of your event *" disabled="disabled" />
+				<a class="tooltip js-tooltip left ml15">?<span>The shorter and more descriptive, the better.</span></a>
+				<div class="clear"></div>
+			</div>
+			<div class="event_info js-event_info">
+				<div class="event_date">
+					<input type="text" size="35" name="event-start-date" id="event-start-date" class="js-event-start-date create_action-editable js-create_action-editable datepick js-datepick" placeholder="Date and Time *" disabled="disabled" />
+					<div class="clear"></div>
+				</div>
+				<div class="event_location_toggle_wrap">
+					<div id="suggested_modal_link_wrap" class="js-suggested_modal_link_wrap">
+						The sponsor of this event campaign asks you to host an event at a suggested location.
+						<a class="button button_red fullwidthbutton">Click here to find a suggested location near you</a>
+					</div>
+					<div id="event_location_toggle">
+						<a>Or host an event at a location of your choosing</a>
+					</div>
+				</div>
+				<div class="clear"></div>
+			</div>
+			<div>
+				<textarea name="event-description" id="event-description" class="redactor js-redactor create_action-editable js-create_action-editable" placeholder="Event description *" disabled="disabled" /><%=@event_campaign.event_description||"Event description *"%>
+				</textarea>
+				<a class="tooltip js-tooltip left ml15">?<span>This is shown to people before they RSVP. Let them know what the event will be like and why they should attend.</span></a>
+				<div class="clear"></div>
+			</div>
+			<div id="action_info">
+				<div id="action_info_inner">
+
+
+        <% if @event_campaign.user and !@event_campaign.user.is_canceled?  %>
+        <div class="sponsor_owner_box">
+          <div class="action_owner_title"><h6>Event by</h6></div>
+          <div class="action_owner_wrap">
+            <div class="action_owner">
+              <a href="<%=current_user ? "/users/#{@event_campaign.user.permalink}/profile" : "#"%>">
+                <%= gravatar_image_tag(@event_campaign.user.email.gsub('spam', 'mdeering'), :alt => @event_campaign.user.first_name, :gravatar => { :size => 88 }, :class => 'action_author_avatar avatar') %>
+              </a>
+              <div class="action_info_user js-action_info_user">
+                <a href="<%=current_user ? "/users/#{@event_campaign.user.permalink}/profile" : "#"%>">
+                  <%= @event_campaign.user.first_name %> <%= @event_campaign.user.last_name %>
+                </a>
+              </div>
+              <% if @event_campaign.user.zip_code %>
+              <div class="action_info_location"><%= @event_campaign.user.zip_code %></div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+        <% end %>
+
+
+        <div class="sponsor_owner_box">
+          <div class="action_owner_title action_sponsor_title"><h6>Sponsored by</h6></div>
+          <div class="action_owner_wrap action_sponsor_wrap">
+            <div class="action_owner">
+              <a href="/groups/<%=@event_campaign.group.permalink%>">
+                <%= image_tag(@event_campaign.group.photo(:thumb), :class => 'action_author_avatar avatar') %>
+              </a>
+              <div class="action_info_user js-action_info_user"><a href="/groups/<%=@event_campaign.group.permalink%>"><%= @event_campaign.group.admin_title %></a></div>
+              <%if !@event_campaign.group.zip_code.blank?%><div class="action_info_location"><%= @event_campaign.group.city %>,<%= STATE_FULL[@event_campaign.group.state] %></div><%end%>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="sponsor_owner_box">
+          <div class="action_owner_title action_sponsor_title"><h6><%=link_to @event_campaign.name,event_campaign_path(@event_campaign.permalink)%> by</h6></div>
+          <div class="action_owner_wrap action_sponsor_wrap">
+            <div class="action_owner">
+              <a href="/groups/<%=@event_campaign.group.permalink%>">
+                <%= image_tag(@event_campaign.group.photo(:thumb), :class => 'action_author_avatar avatar') %>
+              </a>
+              <div class="action_info_user js-action_info_user"><a href="/groups/<%=@event_campaign.group.permalink%>"><%= @event_campaign.group.admin_title %></a></div>
+              <%if !@event_campaign.group.zip_code.blank?%><div class="action_info_location"><%= @event_campaign.group.city %>,<%= STATE_FULL[@event_campaign.group.state] %></div><%end%>
+            </div>
+          </div>
+        </div>
+					<div class="clear"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</form>
+<div class="clear"></div>
+  <%content_for :extra_js do %>
+      <script>
+        $(document).ready(function() {
+          $("form.js-edit_event .js-view_instructions_button").trigger('click');
+        });
+      </script>
+  <%end%>
