@@ -7,6 +7,7 @@ defmodule HtmlContent do
   @strings_with_params_pattern ~r{params\[\:\w+\]}
   @only_numbers_pattern ~r{^\d+\s*$}
   @percentage_pattern ~r(^\s*\d\d%\s*$)
+  @number_currency_pattern ~r/^\s*?\$?[0-9]{1,3}(?:,?[0-9]{3})*(?:\.[0-9]{2})?$/
 
   def map_text_from_html_file(file_path) do
     file_path
@@ -27,6 +28,8 @@ defmodule HtmlContent do
     |> Stream.map(&filter_out_only_numbers/1)
     |> remove_empty_arrays
     |> Stream.map(&filter_out_percentage/1)
+    |> remove_empty_arrays
+    |> Stream.map(&filter_out_number_currency/1)
     |> remove_empty_arrays
     |> Stream.map(&filter_out_only_spaces/1)
     |> remove_empty_arrays
@@ -78,6 +81,10 @@ defmodule HtmlContent do
 
   defp filter_out_percentage(list) do
     Enum.filter(list, fn(str) -> !Regex.match?(@percentage_pattern, str) end)
+  end
+
+  defp filter_out_number_currency(list) do
+    Enum.filter(list, fn(str) -> !Regex.match?(@number_currency_pattern, str) end)
   end
 
   defp remove_empty_arrays(stream) do
