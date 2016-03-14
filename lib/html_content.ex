@@ -12,22 +12,24 @@ defmodule HtmlContent do
     file_path
     |> File.stream!
     |> Stream.map(&(Regex.scan(@frase_in_html_pattern, &1)))
-    |> Stream.filter(&(length(&1) != 0))
+    |> remove_empty_arrays
     |> Stream.map(&get_only_relevant_pattern/1)
     |> Stream.map(&filter_out_html_attrs/1)
-    |> Stream.filter(&(length(&1) != 0))
+    |> remove_empty_arrays
     |> Stream.map(&filter_out_html_symbols/1)
-    |> Stream.filter(&(length(&1) != 0))
+    |> remove_empty_arrays
     |> Stream.map(&filter_out_question_marks/1)
-    |> Stream.filter(&(length(&1) != 0))
+    |> remove_empty_arrays
     |> Stream.map(&filter_out_paths/1)
-    |> Stream.filter(&(length(&1) != 0))
+    |> remove_empty_arrays
     |> Stream.map(&filter_out_strs_with_params/1)
-    |> Stream.filter(&(length(&1) != 0))
+    |> remove_empty_arrays
     |> Stream.map(&filter_out_only_numbers/1)
-    |> Stream.filter(&(length(&1) != 0))
+    |> remove_empty_arrays
     |> Stream.map(&filter_out_percentage/1)
-    |> Stream.filter(&(length(&1) != 0))
+    |> remove_empty_arrays
+    |> Stream.map(&filter_out_only_spaces/1)
+    |> remove_empty_arrays
     #|> Stream.map(&strip_strs/1)
     #|> Stream.map(&filter_out_empty_strings/1)
     #|> Stream.filter(&(length(&1) != 0))
@@ -44,6 +46,10 @@ defmodule HtmlContent do
 
   defp filter_out_html_symbols(list) do
     Enum.filter(list, fn(line) -> !Regex.match?(@html_symbol_pattern, line) end)
+  end
+
+  defp filter_out_only_spaces(list) do
+    Enum.filter(list, fn(line) -> !Regex.match?(~r{^\s*$}, line) end)
   end
 
   defp strip_strs(list) do
@@ -72,6 +78,10 @@ defmodule HtmlContent do
 
   defp filter_out_percentage(list) do
     Enum.filter(list, fn(str) -> !Regex.match?(@percentage_pattern, str) end)
+  end
+
+  defp remove_empty_arrays(stream) do
+    Stream.filter(stream, &(length(&1) != 0))
   end
   # Read file by line
 
