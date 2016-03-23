@@ -2,8 +2,8 @@ defmodule HtmlContent do
   @frase_in_html_pattern ~r{>(?<text>[^<>]+)<}
   @html_attr_pattern ~r{\w=\"}
   @html_symbol_pattern ~r/&\w{4,5};/
-  @single_punctuation_pattern ~r/^[\?\:\,]\s*$/
-  @path_pattern ~r/^\/\w+\/$/
+  @single_punctuation_pattern ~r/^[\?\:\,\!]\s*$/
+  @path_pattern ~r/^\/[\w\/]+\/$/
   @strings_with_params_pattern ~r{params\[\:\w+\]}
   @only_numbers_pattern ~r{^\d+\s*$}
   @percentage_pattern ~r(^\s*\d\d%\s*$)

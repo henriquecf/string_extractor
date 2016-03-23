@@ -4,7 +4,7 @@ defmodule Translatable do
                            prefix: String.t, suffix: String.t}
 
   @prefix_pattern ~r{^(?<prefix>\s*)}
-  @suffix_pattern ~r{(?<suffix>:?\s*)$}
+  @suffix_pattern ~r{(?<suffix>:?\s*\*?\,?\s*)$}
 
   @doc ~S"""
   Extracts the text, prefix, suffix and key from original text
@@ -22,6 +22,12 @@ defmodule Translatable do
 
       iex> Translatable.from_original("simple text")
       %Translatable{original: "simple text", text: "simple text", key: "simple_text", prefix: "", suffix: ""}
+
+      iex> Translatable.from_original("simple text *")
+      %Translatable{original: "simple text *", text: "simple text", key: "simple_text", prefix: "", suffix: " *"}
+
+      iex> Translatable.from_original("simple text, ")
+      %Translatable{original: "simple text, ", text: "simple text", key: "simple_text", prefix: "", suffix: ", "}
 
   """
   def from_original(original_text) do
