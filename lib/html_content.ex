@@ -8,6 +8,7 @@ defmodule HtmlContent do
   @only_numbers_pattern ~r{^\d+\s*$}
   @percentage_pattern ~r(^\s*\d\d%\s*$)
   @number_currency_pattern ~r/^\s*?\$?[0-9]{1,3}(?:,?[0-9]{3})*(?:\.[0-9]{2})?$/
+  @currency_symbol_pattern ~r/^\s*\$\s*$/
 
   def map_text_from_html_file(file_path) do
     file_path
@@ -31,9 +32,14 @@ defmodule HtmlContent do
     |> remove_empty_arrays
     |> Stream.map(&filter_out_number_currency/1)
     |> remove_empty_arrays
+    |> Stream.map(&filter_out_currency_symbol/1)
+    |> remove_empty_arrays
     |> Stream.map(&filter_out_only_spaces/1)
     |> remove_empty_arrays
+    |> Stream.map(&extract_tranlatables/1)
     |> Enum.to_list
+    |> List.flatten
+    |> TranslatableList.from_list(file_path)
   end
 
   defp get_only_relevant_pattern(list) do
@@ -76,8 +82,16 @@ defmodule HtmlContent do
     Enum.filter(list, fn(str) -> !Regex.match?(@number_currency_pattern, str) end)
   end
 
+  defp filter_out_currency_symbol(list) do
+    Enum.filter(list, fn(str) -> !Regex.match?(@currency_symbol_pattern, str) end)
+  end
+
   defp remove_empty_arrays(stream) do
     Stream.filter(stream, &(length(&1) != 0))
+  end
+
+  defp extract_tranlatables(stream) do
+    Enum.map(stream, &Translatable.from_original/1)
   end
   # Read file by line
 

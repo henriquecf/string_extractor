@@ -6,7 +6,7 @@ defmodule SearchMap do
     Path.join([@base_path, @wildcard_views])
     |> Path.wildcard
     |> Stream.map(&HtmlContent.map_text_from_html_file/1)
-    |> Stream.map(&IO.puts/1)
+    |> Stream.map(&IO.inspect/1)
     |> Stream.run
   end
 end
