@@ -14,7 +14,7 @@ defmodule HtmlContent.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger]]
+    [applications: [:logger, :yaml_elixir]]
   end
 
   # Dependencies can be Hex packages:
@@ -28,7 +28,8 @@ defmodule HtmlContent.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:floki, "~> 0.8"}
+      {:yaml_elixir, "~> 1.0.0"},
+      {:yamerl, github: "yakaz/yamerl"}
     ]
   end
 end
