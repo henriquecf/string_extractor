@@ -3,7 +3,7 @@ defmodule Translatable do
   @type t :: %Translatable{original: String.t, text: String.t, key: String.t,
                            prefix: String.t, suffix: String.t}
 
-  @prefix_pattern ~r{^(?<prefix>\s*)}
+  @prefix_pattern ~r{^(?<prefix>\,?\s*)}
   @suffix_pattern ~r{(?<suffix>:?\s*\*?\,?\s*)$}
 
   @doc ~S"""
@@ -28,6 +28,9 @@ defmodule Translatable do
 
       iex> Translatable.from_original("simple text, ")
       %Translatable{original: "simple text, ", text: "simple text", key: "simple_text", prefix: "", suffix: ", "}
+
+      iex> Translatable.from_original(", simple text: ")
+      %Translatable{original: ", simple text: ", text: "simple text", key: "simple_text", prefix: ", ", suffix: ": "}
 
   """
   def from_original(original_text) do
