@@ -32,6 +32,9 @@ defmodule Translatable do
       iex> Translatable.from_original(", simple text: ")
       %Translatable{original: ", simple text: ", text: "simple text", key: "simple_text", prefix: ", ", suffix: ": "}
 
+      iex> Translatable.from_original(", \"complex\" text: ")
+      %Translatable{original: ", \"complex\" text: ", text: "\\\"complex\\\" text", key: "complex_text", prefix: ", ", suffix: ": "}
+
   """
   def from_original(original_text) do
     text = extract_text(original_text)
@@ -40,7 +43,7 @@ defmodule Translatable do
   end
 
   defp key_from_text(text) do
-    text
+    Regex.replace(~r/\\\"/, text, "")
     |> String.downcase
     |> String.split(" ")
     |> Enum.join("_")
@@ -58,6 +61,7 @@ defmodule Translatable do
 
   defp extract_text(original_text) do
     text_without_prefix = Regex.replace(@prefix_pattern, original_text, "")
-    Regex.replace(@suffix_pattern, text_without_prefix, "")
+    text = Regex.replace(@suffix_pattern, text_without_prefix, "")
+    Regex.replace(~r/\"/, text, "\\\"")
   end
 end
