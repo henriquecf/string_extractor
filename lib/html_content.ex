@@ -1,11 +1,11 @@
 defmodule HtmlContent do
   @frase_in_html_pattern ~r{>(?<text>[^<>]+)<}
-  @html_attr_pattern ~r{\w=\"}
+  @html_attr_pattern ~r{\w=[\"\']}
   @html_symbol_pattern ~r/&\w{4,5};/
   @single_punctuation_pattern ~r/^\s*[\?\:\,\!\"\-\#\-\.\(\)]+\s*$/
   @path_pattern ~r/^\/[\w\/]+\/$/
   @strings_with_params_pattern ~r{params\[\:\w+\]}
-  @only_numbers_pattern ~r{^\d+\s*$}
+  @only_numbers_pattern ~r{^\+?\d+\s*$}
   @percentage_pattern ~r(^\s*\d\d%\s*$)
   @number_currency_pattern ~r/^\s*?\$?[0-9]{1,3}(?:,?[0-9]{3})*(?:\.[0-9]{2})?$/
   @currency_symbol_pattern ~r/^\s*\$\s*$/
