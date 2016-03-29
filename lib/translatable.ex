@@ -3,7 +3,7 @@ defmodule Translatable do
   @type t :: %Translatable{original: String.t, text: String.t, key: String.t,
                            prefix: String.t, suffix: String.t}
 
-  @prefix_pattern ~r{^(?<prefix>\"?\,?(\'s)?(--)?\s*)}
+  @prefix_pattern ~r{^(?<prefix>\"?[\,\.]?(\'s)?(--)?\s*)}
   @suffix_pattern ~r{(?<suffix>:?\s*\*?\,?\s*)$}
 
   @doc ~S"""
@@ -13,6 +13,9 @@ defmodule Translatable do
 
       iex> Translatable.from_original(" simple text: ")
       %Translatable{original: " simple text: ", text: "simple text", key: "simple_text", prefix: " ", suffix: ": "}
+
+      iex> Translatable.from_original(". simple text: ")
+      %Translatable{original: ". simple text: ", text: "simple text", key: "simple_text", prefix: ". ", suffix: ": "}
 
       iex> Translatable.from_original("simple, with comma. Text")
       %Translatable{original: "simple, with comma. Text", text: "simple, with comma. Text", key: "simple_with_comma_text", prefix: "", suffix: ""}
@@ -47,6 +50,9 @@ defmodule Translatable do
       iex> Translatable.from_original("\", simple text: ")
       %Translatable{original: "\", simple text: ", text: "simple text", key: "simple_text", prefix: "\", ", suffix: ": "}
 
+      iex> Translatable.from_original("symbols @|/()[]{}':+%=!& removed")
+      %Translatable{original: "symbols @|/()[]{}':+%=!& removed", text: "symbols @|/()[]{}':+%=!& removed", key: "symbols_removed", prefix: "", suffix: ""}
+
   """
   def from_original(original_text) do
     text = extract_text(original_text)
@@ -56,9 +62,10 @@ defmodule Translatable do
 
   defp key_from_text(text) do
     remove_quotes = Regex.replace(~r/\\\"/, text, "")
-    Regex.replace(~r/[.,]/, remove_quotes, "")
+    Regex.replace(~r{[.,@/()\[\]|\{\}':\+%=!&]}, remove_quotes, "")
     |> String.downcase
-    |> String.split(" ")
+    |> String.strip
+    |> String.split(~r/\s+/)
     |> Enum.join("_")
   end
 

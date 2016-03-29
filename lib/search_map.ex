@@ -2,6 +2,10 @@ defmodule SearchMap do
   @base_path "/Users/henrique/code/can2/app"
   @wildcard_views "views/**/*.html.erb"
 
+  """
+  Snippet to find error when parsing files:
+  Path.wildcard(p) |> Enum.map( fn (f) -> IO.puts(f); YamlElixir.read_from_file(f) end)
+  """
   def process_views() do
     Path.join([@base_path, @wildcard_views])
     |> Path.wildcard

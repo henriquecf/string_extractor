@@ -1,14 +1,16 @@
 defmodule HtmlContent do
   @frase_in_html_pattern ~r{>(?<text>[^<>]+)<}
-  @html_attr_pattern ~r{\w=[\"\']}
+  @html_attr_pattern ~r{\w=[\"']}
   @html_symbol_pattern ~r/&\w{4,5};/
-  @single_punctuation_pattern ~r/^\s*[\?\:\,\!\"\-\#\-\.\(\)]+\s*$/
+  @single_punctuation_pattern ~r/^\s*[\?\:\,\!\"\-\#\-\.\(\)\_\/\|\+\=\[\]\@\s]+\s*$/
   @path_pattern ~r/^\/[\w\/]+\/$/
   @strings_with_params_pattern ~r{params\[\:\w+\]}
   @only_numbers_pattern ~r{^\+?\d+\s*$}
   @percentage_pattern ~r(^\s*\d\d%\s*$)
-  @number_currency_pattern ~r/^\s*?\$?[0-9]{1,3}(?:,?[0-9]{3})*(?:\.[0-9]{2})?$/
+  @number_currency_pattern ~r/^\s*?\$?[0-9]{1,3}(?:,?[0-9]{3})*(?:\.[0-9]{2})?\s*$/
   @currency_symbol_pattern ~r/^\s*\$\s*$/
+  @null_word_pattern ~r/^\s*null\s*$/i
+  @plural_pattern ~r/^\s*'s\s*$/i
 
   def map_text_from_html_file(file_path) do
     file_path
@@ -33,6 +35,10 @@ defmodule HtmlContent do
     |> Stream.map(&filter_out_number_currency/1)
     |> remove_empty_arrays
     |> Stream.map(&filter_out_currency_symbol/1)
+    |> remove_empty_arrays
+    |> Stream.map(&filter_out_null_word/1)
+    |> remove_empty_arrays
+    |> Stream.map(&filter_out_plural/1)
     |> remove_empty_arrays
     |> Stream.map(&filter_out_only_spaces/1)
     |> remove_empty_arrays
@@ -84,6 +90,14 @@ defmodule HtmlContent do
 
   defp filter_out_currency_symbol(list) do
     Enum.filter(list, fn(str) -> !Regex.match?(@currency_symbol_pattern, str) end)
+  end
+
+  defp filter_out_null_word(list) do
+    Enum.filter(list, fn(str) -> !Regex.match?(@null_word_pattern, str) end)
+  end
+
+  defp filter_out_plural(list) do
+    Enum.filter(list, fn(str) -> !Regex.match?(@plural_pattern, str) end)
   end
 
   defp remove_empty_arrays(stream) do
