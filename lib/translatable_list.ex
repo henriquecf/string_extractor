@@ -30,7 +30,8 @@ defmodule TranslatableList do
     path = Path.join(@path, Path.join(path_list)) <> ".json"
     new_translatable_list = case File.read(path) do
       {:ok, json_str} ->
-        old_translatable_list = Poison.decode!(json_str, as: TranslatableList, keys: :atoms!)
+        old_translatable_list = Poison.decode!(json_str,  as: %TranslatableList{translatables: [%Translatable{}]}, keys: :atoms!)
+        IO.inspect(old_translatable_list)
         %TranslatableList{translatable_list | translatables: old_translatable_list.translatables ++ translatable_list.translatables}
       {:error, _reason} ->
         translatable_list
