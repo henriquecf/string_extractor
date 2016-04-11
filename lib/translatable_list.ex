@@ -21,18 +21,22 @@ defmodule TranslatableList do
   end
 
   defp yml_file_str(translatable_list, lang \\ "pt_BR") do
-    path_list =
+    path_str =
       translatable_list.file_path
       |> Path.relative_to(@base_path)
       |> Path.rootname(".html.erb")
-      |> Path.split
-    {initial_str_list, final_index} = base_yml_str(path_list)
-    values = Enum.map(translatable_list.translatables, fn (translatable) ->
-      String.duplicate(" ", final_index) <> "#{translatable.key}: \"#{translatable.text}\""
-    end)
-    str = Enum.join(["#{lang}:"] ++ initial_str_list ++ values, "\n")
+    path_list = Path.split(path_str)
+    str = create_yml_str(translatable_list.translatables, path_list, lang)
     yml_path = Path.join(@yml_path, Path.join(path_list)) <> ".yml"
     %TranslatableList{translatable_list | yml_file_str: str, yml_path: yml_path}
+  end
+
+  defp create_yml_str(translatables, path_list, lang) do
+    {initial_str_list, final_index} = base_yml_str(path_list)
+    values = Enum.map(translatables, fn (translatable) ->
+      String.duplicate(" ", final_index) <> "#{translatable.key}: \"#{translatable.text}\""
+    end)
+    Enum.join(["#{lang}:"] ++ initial_str_list ++ values, "\n")
   end
 
   defp base_yml_str(list) do
