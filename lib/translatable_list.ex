@@ -22,15 +22,22 @@ defmodule TranslatableList do
   end
 
   defp yml_file_str(translatable_list, lang \\ "pt_BR") do
-    path_str =
+    path_list =
       translatable_list.file_path
       |> Path.relative_to(@base_path)
       |> Path.rootname(".html.erb")
-    path_list = Path.split(path_str)
-    str = create_yml_str(translatable_list.translatables, path_list, lang)
-    yml_path = Path.join(@yml_path, Path.join(path_list)) <> ".yml"
+      |> Path.split
     path = Path.join(@path, Path.join(path_list)) <> ".json"
-    %TranslatableList{translatable_list | yml_file_str: str, yml_path: yml_path, path: path}
+    new_translatable_list = case File.read(path) do
+      {:ok, json_str} ->
+        old_translatable_list = Poison.decode!(json_str, as: TranslatableList, keys: :atoms!)
+        %TranslatableList{translatable_list | translatables: old_translatable_list.translatables ++ translatable_list.translatables}
+      {:error, _reason} ->
+        translatable_list
+    end
+    str = create_yml_str(new_translatable_list.translatables, path_list, lang)
+    yml_path = Path.join(@yml_path, Path.join(path_list)) <> ".yml"
+    %TranslatableList{new_translatable_list | yml_file_str: str, yml_path: yml_path, path: path}
   end
 
   defp create_yml_str(translatables, path_list, lang) do
