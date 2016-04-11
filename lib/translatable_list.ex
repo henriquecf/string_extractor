@@ -32,7 +32,11 @@ defmodule TranslatableList do
       {:ok, json_str} ->
         old_translatable_list = Poison.decode!(json_str,  as: %TranslatableList{translatables: [%Translatable{}]}, keys: :atoms!)
         IO.inspect(old_translatable_list)
-        %TranslatableList{translatable_list | translatables: old_translatable_list.translatables ++ translatable_list.translatables}
+        translatables =
+          old_translatable_list.translatables
+          |> Enum.concat(translatable_list.translatables)
+          |> Enum.uniq
+        %TranslatableList{translatable_list | translatables: translatables}
       {:error, _reason} ->
         translatable_list
     end
