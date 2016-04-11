@@ -1,4 +1,5 @@
 %{"floki": {:hex, :floki, "0.8.0"},
   "mochiweb_html": {:hex, :mochiweb_html, "2.13.0"},
+  "poison": {:hex, :poison, "2.1.0"},
   "yamerl": {:git, "https://github.com/yakaz/yamerl.git", "ae810a808817d9482b4628ae3e20d746e3729fe0", []},
   "yaml_elixir": {:hex, :yaml_elixir, "1.0.0"}}

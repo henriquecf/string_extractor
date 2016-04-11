@@ -1,13 +1,14 @@
 defmodule TranslatableList do
+  @derive [Poison.Encoder]
+  defstruct [:translatables, :file_path, :yml_file_str, :yml_path, :path]
+
   @type translatables_list :: [Translatable.t]
-
-  defstruct [:translatables, :file_path, :yml_file_str, :yml_path]
-
-  @type t :: %TranslatableList{translatables: translatables_list,
+  @type t :: %TranslatableList{translatables: translatables_list, path: String.t,
     file_path: String.t, yml_file_str: String.t, yml_path: String.t}
 
   @base_path "/Users/henrique/code/can2/app"
-  @yml_path "/Users/henrique/code/html_content/tmp/locales"
+  @yml_path @base_path <> "/locales"
+  @path "/Users/henrique/code/html_content/translatables/can"
 
   def from_list(list, file_path) do
     yml_file_str(%TranslatableList{translatables: list, file_path: file_path})
@@ -28,7 +29,8 @@ defmodule TranslatableList do
     path_list = Path.split(path_str)
     str = create_yml_str(translatable_list.translatables, path_list, lang)
     yml_path = Path.join(@yml_path, Path.join(path_list)) <> ".yml"
-    %TranslatableList{translatable_list | yml_file_str: str, yml_path: yml_path}
+    path = Path.join(@path, Path.join(path_list)) <> ".json"
+    %TranslatableList{translatable_list | yml_file_str: str, yml_path: yml_path, path: path}
   end
 
   defp create_yml_str(translatables, path_list, lang) do

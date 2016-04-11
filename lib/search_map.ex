@@ -15,8 +15,8 @@ defmodule SearchMap do
   end
 
   defp write_to_file(%TranslatableList{translatables: list} = translatables_list) when length(list) > 0 do
-    File.mkdir_p(Path.dirname(translatables_list.yml_path))
-    File.write!(translatables_list.yml_path, translatables_list.yml_file_str)
+    File.mkdir_p(Path.dirname(translatables_list.path))
+    File.write!(translatables_list.path, Poison.encode!(translatables_list))
     translatables_list
   end
 
