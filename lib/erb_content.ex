@@ -18,11 +18,18 @@ defmodule ErbContent do
     ~r{["']([#\w]+[_]+[#\w]+)+[#\s\w]*["']},
     ~r{\+\s*["'][,\s]+["']\s*\+},
     ~r{["']US["']},
-    ~r{".*[\w]=.*"}
+    ~r{".*[\w]=.*"},
+    ~r{"[#]"},
+    ~r{class="<%.*%>"}
   ]
   def map_erb() do
-    "/Users/ivan/code/can2/app/views/petitions/thankyou.html.erb"
+    "/Users/ivan/code/can2/app/views/petitions/manage.html.erb"
     |> File.stream!
+    |> Stream.map(&(Regex.scan(~r{.*\n}, &1)))
+    |> remove_empty_arrays
+    |> Enum.map(&Enum.at(&1, 0))
+    |> Enum.map(&Enum.at(&1, 0))
+    |> Enum.map(&remove_undesired_patterns/1)
     |> Stream.map(&(Regex.scan(~r{<%(.*?)%>}, &1)))
     |> remove_empty_arrays
     |> Enum.map(&Enum.at(&1, 0))
