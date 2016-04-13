@@ -37,7 +37,7 @@ defmodule ErbContent do
     |> Stream.map(&Enum.at(&1, 0))
     |> Stream.map(&remove_undesired_patterns/1)
     |> Stream.filter(fn(line) -> Regex.match?(~r{.*["'].*}, line) end)
-    |> Stream.map(&(Regex.scan(~r{"(?<text>.*)"}, &1)))
+    |> Stream.map(&(Regex.scan(~r{"(?<text>.*?)"}, &1)))
     |> remove_empty_arrays
     |> Stream.map(&Enum.at(&1, 0))
     |> Stream.map(&Enum.at(&1, 1))
