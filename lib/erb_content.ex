@@ -20,26 +20,29 @@ defmodule ErbContent do
     ~r{["']US["']},
     ~r{".*[\w]=.*"},
     ~r{"[#]"},
-    ~r{class="<%.*%>"}
+    ~r{class="<%.*%>"},
+    ~r{"none"}
   ]
-  def map_erb() do
-    "/Users/ivan/code/can2/app/views/petitions/manage.html.erb"
+  def map_text_from_erb(file_path) do
+    file_path
     |> File.stream!
     |> Stream.map(&(Regex.scan(~r{.*\n}, &1)))
     |> remove_empty_arrays
-    |> Enum.map(&Enum.at(&1, 0))
-    |> Enum.map(&Enum.at(&1, 0))
-    |> Enum.map(&remove_undesired_patterns/1)
+    |> Stream.map(&Enum.at(&1, 0))
+    |> Stream.map(&Enum.at(&1, 0))
+    |> Stream.map(&remove_undesired_patterns/1)
     |> Stream.map(&(Regex.scan(~r{<%(.*?)%>}, &1)))
     |> remove_empty_arrays
-    |> Enum.map(&Enum.at(&1, 0))
-    |> Enum.map(&Enum.at(&1, 0))
-    |> Enum.map(&remove_undesired_patterns/1)
-    |> Enum.filter(fn(line) -> Regex.match?(~r{.*["'].*}, line) end)
+    |> Stream.map(&Enum.at(&1, 0))
+    |> Stream.map(&Enum.at(&1, 0))
+    |> Stream.map(&remove_undesired_patterns/1)
+    |> Stream.filter(fn(line) -> Regex.match?(~r{.*["'].*}, line) end)
     |> Stream.map(&(Regex.scan(~r{"(?<text>.*)"}, &1)))
     |> remove_empty_arrays
-    |> Enum.map(&Enum.at(&1, 0))
-    |> Enum.map(&Enum.at(&1, 1))
+    |> Stream.map(&Enum.at(&1, 0))
+    |> Stream.map(&Enum.at(&1, 1))
+    |> Enum.map(&Translatable.from_original/1)
+    |> TranslatableList.from_list(file_path)
   end
 
   defp remove_undesired_patterns(string) do
