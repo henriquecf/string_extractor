@@ -1,13 +1,8 @@
 defmodule ErbContent do
   @patterns_to_remove [
     ~r{render\s+["'][#\w\s.]+["']},
-    ~r{:class\s+=>\s+["'][#\w\s-]+["']},
-    ~r{:id\s+=>\s+["'][#\w\s-]+["']},
-    ~r{:controller\s+=>\s+["'][#\w\s-]+["']},
-    ~r{:action\s+=>\s+["'][#\w\s-]+["']},
-    ~r{:novalidate\s+=>\s+["'][#\w\s-]+["']},
-    ~r{:equalTo\s+=>\s+["'][#\w\s-]+["']},
-    ~r{:target\s+=>\s+["'][#\w\s-]+["']},
+    ~r{:(class|id|controller|action|novalidate|equalTo|target)\s*=>\s*["'][#\w\s-]*(#\{.*\})*[#\w\s-]*["']},
+    ~r{(class|id|controller|action|novalidate|equalTo|target):\s*["'][#\w\s-]*(#\{.*\})*[#\w\s-]*["']},
     ~r{render\s+["'].*["']},
     ~r{template:\s+["'][\w\s\/]+["']},
     ~r{layout:\s+["'][\w\s\/]+["']},
