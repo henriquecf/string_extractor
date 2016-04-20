@@ -37,6 +37,26 @@ defmodule ErbContent do
     |> List.flatten
     |> Enum.map(&Translatable.from_original/1)
     |> TranslatableList.from_list(file_path)
+    |> replace_keys_in_a_file
+  end
+
+  def replace_keys_in_a_file(translatable_list) do
+    translatable_list.file_path
+    |> File.stream!
+    |> Enum.map(&(replace_keys_in_a_line(&1, translatable_list)))
+    |> write_file(translatable_list.file_path)
+  end
+
+  def replace_keys_in_a_line(line, translatable_list) do
+    translatable_list.translatables
+    |> Enum.reduce(line, &(Regex.replace(~r{(<%.*)(["']#{&1.text}["'])(.*%>)}, &2, "\\1t(\".#{&1.key}\")\\3")))
+  end
+
+  def write_file(lines, file) do
+    {:ok, file} = File.open(file, [:write], fn(f) ->
+      lines
+      |> Enum.map(&(IO.write(f, &1)))
+    end)
   end
 
   defp get_position(list, indice) do
